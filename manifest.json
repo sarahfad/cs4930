@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Wikipedia Change Detector",
+  "version": "1.0",
+  "description": "Detects changes or censorship on Wikipedia pages using the Wayback Machine.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.wikipedia.org/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "host_permissions": [
+    "https://archive.org/*",
+    "https://web.archive.org/*"
+  ]
+}

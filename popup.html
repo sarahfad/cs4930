@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Wikipedia Change Detector</title>
+    <script type="module" src="popup.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        width: 350px;
+        padding: 15px;
+        margin: 0;
+        background: #f5f5f5;
+      }
+      h3 {
+        margin: 0 0 15px 0;
+        color: #333;
+        font-size: 18px;
+      }
+      button {
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px 15px;
+        font-size: 14px;
+        background: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      button:hover {
+        background: #0052a3;
+      }
+      button:active {
+        background: #004080;
+      }
+      #result {
+        margin-top: 15px;
+        padding: 12px;
+        background: white;
+        border-radius: 5px;
+        border-left: 4px solid #ccc;
+        font-size: 13px;
+        line-height: 1.5;
+        min-height: 60px;
+      }
+      #result strong {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 14px;
+      }
+      #result small {
+        color: #666;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Wikipedia Change Detector</h3>
+    <button id="analyze">Analyze Page</button>
+    <div id="result">Click "Analyze Page" to check for changes against the Wayback Machine archive.</div>
+  </body>
+</html>
