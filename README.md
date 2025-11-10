@@ -8,4 +8,4 @@ A browser extension that checks Wikipedia pages for edits or potential censorshi
 3. Click **Load unpacked**
 4. Select this folder
 5. Go to any Wikipedia page and open the extension popup to analyze it.
-# WikiChangeWatch
+
