@@ -7,7 +7,8 @@
     <style>
       body {
         font-family: Arial, sans-serif;
-        width: 350px;
+        width: 600px;
+        max-width: 90vw;
         padding: 15px;
         margin: 0;
         background: #f5f5f5;
@@ -35,6 +36,10 @@
       button:active {
         background: #004080;
       }
+      button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
       #result {
         margin-top: 15px;
         padding: 12px;
@@ -54,11 +59,182 @@
         color: #666;
         font-size: 11px;
       }
+      #diff-view {
+        margin-top: 15px;
+        display: none;
+        background: white;
+        border-radius: 5px;
+        overflow: hidden;
+        max-height: 500px;
+        overflow-y: auto;
+      }
+      .diff-header {
+        background: #f0f0f0;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .diff-content {
+        padding: 10px;
+        font-size: 12px;
+        line-height: 1.8;
+        word-wrap: break-word;
+      }
+      .diff-block {
+        margin: 12px 0;
+        padding: 0;
+        border-radius: 4px;
+        line-height: 1.8;
+        overflow: hidden;
+      }
+      .diff-block-changed {
+        background: #fff5f5;
+        border-left: 4px solid #ff6b6b;
+        border-radius: 0 4px 4px 0;
+      }
+      .diff-block-unchanged {
+        background: #f8f9fa;
+        opacity: 0.8;
+        padding: 8px 10px;
+      }
+      .diff-block-indicator {
+        background: #ffe0e0;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: bold;
+        border-bottom: 1px solid #ffcccc;
+      }
+      .diff-indicator-removed {
+        color: #721c24;
+      }
+      .diff-indicator-added {
+        color: #155724;
+      }
+      .diff-block-content {
+        padding: 10px 12px;
+      }
+      .diff-separator {
+        height: 1px;
+        background: #ddd;
+        margin: 8px 0;
+      }
+      .diff-chunk {
+        display: inline;
+        padding: 2px 4px;
+        margin: 0 1px;
+        border-radius: 3px;
+        white-space: normal;
+        word-break: break-word;
+      }
+      .diff-unchanged {
+        color: #666;
+        font-weight: normal;
+      }
+      .diff-added {
+        background: #d4edda;
+        color: #155724;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 2px 5px;
+      }
+      .diff-removed {
+        background: #f8d7da;
+        color: #721c24;
+        text-decoration: line-through;
+        font-weight: 500;
+        padding: 2px 5px;
+      }
+      .diff-stats {
+        margin-top: 10px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-top: 1px solid #ddd;
+        font-size: 11px;
+        color: #666;
+      }
+      .toggle-view {
+        font-size: 11px;
+        color: #0066cc;
+        cursor: pointer;
+        text-decoration: underline;
+        margin-left: 10px;
+      }
+      .toggle-view:hover {
+        color: #0052a3;
+      }
+      .diff-hidden {
+        display: none;
+      }
+      .diff-controls {
+        padding: 8px 10px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+        font-size: 11px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .diff-controls label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+      }
+      .diff-controls input[type="checkbox"] {
+        cursor: pointer;
+      }
+      #date-selector {
+        margin: 10px 0;
+        padding: 10px;
+        background: white;
+        border-radius: 5px;
+        display: none;
+      }
+      #date-selector label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 12px;
+        color: #666;
+        font-weight: bold;
+      }
+      #date-select {
+        width: 100%;
+        padding: 8px;
+        font-size: 13px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        cursor: pointer;
+      }
+      #date-select:disabled {
+        background: #f5f5f5;
+        cursor: not-allowed;
+      }
+      .date-info {
+        margin-top: 5px;
+        font-size: 11px;
+        color: #666;
+        font-style: italic;
+      }
+      .date-loading {
+        color: #0066cc;
+      }
     </style>
   </head>
   <body>
     <h3>Wikipedia Change Detector</h3>
+    <div id="date-selector">
+      <label for="date-select">Compare with archive from:</label>
+      <select id="date-select" disabled>
+        <option value="">Loading available dates...</option>
+      </select>
+      <div id="date-info" class="date-info"></div>
+    </div>
     <button id="analyze">Analyze Page</button>
     <div id="result">Click "Analyze Page" to check for changes against the Wayback Machine archive.</div>
+    <div id="diff-view"></div>
   </body>
 </html>

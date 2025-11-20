@@ -101,13 +101,19 @@ export function compareSnapshots(currentHtml, archivedHtml) {
     const threshold = 0.80; // 80% similar = no significant change
     const changed = similarity < threshold;
 
+    // Calculate word-level diff
+    const wordDiff = calculateWordDiff(currentContent, archivedContent);
+    
     return {
       changed,
       reason: changed 
         ? `Content differs by ${((1 - similarity) * 100).toFixed(1)}%`
         : "Content is essentially the same",
       similarity: (similarity * 100).toFixed(1) + "%",
-      diffCount: Math.abs(currentContent.length - archivedContent.length)
+      diffCount: Math.abs(currentContent.length - archivedContent.length),
+      wordDiff: wordDiff,
+      currentText: currentContent,
+      archivedText: archivedContent
     };
   } catch (error) {
     console.error("Error comparing snapshots:", error);
@@ -147,4 +153,105 @@ function getBigrams(str) {
     bigrams.add(str.substring(i, i + 2));
   }
   return bigrams;
+}
+
+// Calculate word-level diff - returns grouped chunks for better visualization
+function calculateWordDiff(text1, text2) {
+  const words1 = text1.split(/\s+/).filter(w => w.length > 0);
+  const words2 = text2.split(/\s+/).filter(w => w.length > 0);
+  
+  // Use a greedy diff algorithm for better performance
+  const diff = [];
+  let i = 0, j = 0;
+  
+  while (i < words1.length || j < words2.length) {
+    // Try to find the next matching word
+    if (i < words1.length && j < words2.length && words1[i] === words2[j]) {
+      // Words match - add as unchanged
+      diff.push({ type: 'unchanged', text: words1[i] });
+      i++;
+      j++;
+    } else {
+      // Look ahead to find next common word
+      let foundMatch = false;
+      let lookahead = 1;
+      const maxLookahead = Math.min(50, Math.max(words1.length - i, words2.length - j));
+      
+      // Try to find where sequences align again
+      while (lookahead <= maxLookahead && !foundMatch) {
+        // Check if removing words from text1 helps
+        if (i + lookahead < words1.length && 
+            j < words2.length && 
+            words1[i + lookahead] === words2[j]) {
+          // Remove words from text1
+          for (let k = 0; k < lookahead; k++) {
+            diff.push({ type: 'removed', text: words1[i + k] });
+          }
+          i += lookahead;
+          foundMatch = true;
+        }
+        // Check if adding words from text2 helps
+        else if (i < words1.length && 
+                 j + lookahead < words2.length && 
+                 words1[i] === words2[j + lookahead]) {
+          // Add words from text2
+          for (let k = 0; k < lookahead; k++) {
+            diff.push({ type: 'added', text: words2[j + k] });
+          }
+          j += lookahead;
+          foundMatch = true;
+        }
+        lookahead++;
+      }
+      
+      // If no match found, treat as change
+      if (!foundMatch) {
+        if (i < words1.length && j < words2.length) {
+          // Replace
+          diff.push({ type: 'removed', text: words1[i] });
+          diff.push({ type: 'added', text: words2[j] });
+          i++;
+          j++;
+        } else if (i < words1.length) {
+          diff.push({ type: 'removed', text: words1[i] });
+          i++;
+        } else if (j < words2.length) {
+          diff.push({ type: 'added', text: words2[j] });
+          j++;
+        }
+      }
+    }
+  }
+  
+  // Group consecutive chunks of same type for better visualization
+  return groupDiffChunks(diff);
+}
+
+// Group consecutive diff chunks of the same type
+function groupDiffChunks(diff) {
+  if (diff.length === 0) return [];
+  
+  const grouped = [];
+  let currentChunk = { type: diff[0].type, words: [] };
+  
+  for (const item of diff) {
+    if (item.type === currentChunk.type) {
+      currentChunk.words.push(item.text);
+    } else {
+      // Save current chunk and start new one
+      if (currentChunk.words.length > 0) {
+        currentChunk.text = currentChunk.words.join(' ');
+        grouped.push(currentChunk);
+      }
+      currentChunk = { type: item.type, words: [item.text] };
+    }
+  }
+  
+  // Don't forget the last chunk
+  if (currentChunk.words.length > 0) {
+    currentChunk.text = currentChunk.words.join(' ');
+    grouped.push(currentChunk);
+  }
+  
+  return grouped;
 }
