@@ -72,7 +72,7 @@ chrome://extensions
 1. The extension captures the live HTML content of the current Wikipedia page.
 2. It requests the closest archived snapshot using the Wayback Machine API.
 3. Both versions undergo cleaning to remove styling, scripts, and non-content markup.
-4. A Python comparison script analyzes text differences and structural changes.
+4. A comparison script analyzes text differences and structural changes.
 5. The popup displays:
    - Percentage similarity
    - Highlighted text differences
